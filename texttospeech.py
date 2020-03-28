@@ -1,18 +1,25 @@
 import pyttsx3
-import time
+import datetime
 import json
 from difflib import get_close_matches
 
 engine=pyttsx3.init()
+data=json.load(open("data.json")) #First loading the jason file into "data"
 
 def voice(w):
     voices = engine.getProperty('voices')
-    engine.setProperty('rate', 150)
+    engine.setProperty('rate', 175)
     engine.setProperty('voice',voices[1].id)
     engine.say(w)
     engine.runAndWait()
 
-data=json.load(open("data.json")) #First loading the jason file into "data"
+def second_choice(w):              # for similar matching word
+    voices = engine.getProperty('voices')
+    engine.setProperty('rate', 175)
+    engine.setProperty('voice',voices[1].id)
+    engine.say("I Found similar matching word '{}'".format(w)+"\n It means '{}'".format(data[get_close_matches(w,data.keys())[0]]))
+    engine.runAndWait()
+
 def translate(w):
     if w in data:
         print(voice(data[w]))
@@ -24,7 +31,7 @@ def translate(w):
         print(voice(data[w.upper()]))
         return data[w.upper()]
     elif len(get_close_matches(w,data.keys()))>0:
-        print(voice(data[get_close_matches(w,data.keys())[0]]))
+        print(second_choice(get_close_matches(w,data.keys())[0]))
         return data[get_close_matches(w,data.keys())[0]]
     else:
         return(voice("Sorry I couldn't find the word .\n Please try again"))
@@ -32,7 +39,7 @@ def translate(w):
 while True:
     word=input("Enter word:") # Continues asking inputs from user untill user enter "\end"
     if(word=='\end'):
-        print(voice("Thank you for using our Program!!"))
+        print(voice("Thank you for using our Program!!, Good Bye!!"))
         break
     else:
         output=translate(word.lower()) #calling function because data set contain all the word in lower case
